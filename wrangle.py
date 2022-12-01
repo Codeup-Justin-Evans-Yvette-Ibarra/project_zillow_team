@@ -308,7 +308,7 @@ def rename_columns(df):
                         'decktypeid': 'has_deck',
                         'fireplacecnt': 'has_fireplace',
                         'garagecarcnt': 'has_garage',
-                        'Las Angeles County': 'la_county',
+                        'Los Angeles County': 'la_county',
                         'Ventura County': 'ventura_county',
                         'Orange County': 'orange_county'}
             , inplace = True)
