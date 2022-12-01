@@ -252,6 +252,7 @@ def rearange_columns(df):
 'roomcnt',
 'numberofstories', 
 'assessmentyear', 
+'finishedsquarefeet12',
 'transaction_date', 
 'land_use', 
     """
@@ -284,7 +285,6 @@ def rearange_columns(df):
             'rawcensustractandblock', 
             'censustractandblock', 
             'calculatedfinishedsquarefeet',
-            'finishedsquarefeet12',
             'lotsizesquarefeet', 
             'structuretaxvaluedollarcnt',
             'taxvaluedollarcnt', 
