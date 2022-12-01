@@ -106,13 +106,16 @@ def zillow_prep(df):
     df = convert_null_to_cat(df)
     
     # Feature Engineer: Home_age and optional_feature
-    # df = new_features(df)
+    df = new_features(df)
 
     #encode categorical features or turn to 0 & 1:
-    #df = encode_features(df)
+    df = encode_features(df)
+
+    # Converts FIPS code to State and County and pivot to categorical features by county
+    df = fips_conversion(df)
 
     # rename dummy county to matching county name
-    df = rename_county(df)
+    #df = rename_county(df)
 
     #--------------- DROP NULL/NaN ---------------#
 
@@ -187,23 +190,52 @@ def convert_null_to_cat(df):
 
 def new_features(df):
     ''' new_features takes in dataframe'''
-    #Creating new column for home age using year_built, casting as float
-    df['home_age'] = 2017- df['yearbuilt']
-    df["home_age"] = df["home_age"].astype('float')
+    # Create a feature that shows the age of the home in 2017
+    df['age'] = 2017 - df.yearbuilt
     
+    # Create Categorical Feature that shows count of "Optional Additions" 
     df['optional_features'] = (df.garagecarcnt==1)|(df.decktypeid == 1)|(df.poolcnt == 1)|(df.fireplacecnt == 1)
     
     return df
     
 def encode_features(df):
-    df.fireplacecnt = df.fireplacecnt.replace({2:1, 3:1, 4:1, 5:1})
-    df.decktypeid= df.decktypeid.replace({66:1})
-    df.garagecarcnt = df.garagecarcnt.replace({2:1, 3:1, 4:1, 5:1, 6:1, 7:1, 8:1, 9:1, 10:1, 13:1,14:1})
+    # Replace Conditional values
+    df["taxdelinquencyyear"] = np.where(df["taxdelinquencyyear"] > 0, 1, 0)
+    df["basementsqft"] = np.where(df["basementsqft"] > 0, 1, 0)
+    df.fireplacecnt = np.where(df["fireplacecnt"] > 0, 1, 0)
+    df.decktypeid = np.where(df["decktypeid"] > 0, 1, 0)
+    df.garagecarcnt = np.where(df["garagecarcnt"] > 0, 1, 0)
     df.optional_features = df.optional_features.replace({False:0, True: 1})
-    temp = pd.get_dummies(df['county'], drop_first=False)
-    df = pd.concat([df, temp],axis =1)
+    # [QMCBT] I commented these out because "county" doesn't exist yet?
+    # temp = pd.get_dummies(df['county'], drop_first=False)
+    # df = pd.concat([df, temp],axis =1)
     return df 
 
+def fips_conversion(df):
+    """
+    Found a csv fips master list on github. Used it to convert FIPS to State and County Features.    
+    """
+
+    # Read in as a DataFrame using raw url
+    url = 'https://raw.githubusercontent.com/kjhealy/fips-codes/master/state_and_county_fips_master.csv'
+    fips_df = pd.read_csv(url)
+    
+    # Cache data into a new csv file
+    fips_df.to_csv('state_and_county_fips_master.csv')
+    
+    # left merge to join the name and state to the original df
+    left_merged_fips_df = pd.merge(df, fips_df, how="left", on=["fips"])
+    
+    # Create seperate catagorical features for each county "name" 
+    temp = pd.get_dummies(left_merged_fips_df['name'], drop_first=False)
+    left_merged_fips_df = pd.concat([left_merged_fips_df, temp],axis =1)
+    
+    # assign to df
+    df = left_merged_fips_df
+
+    return df
+
+# [QMCBT] This function is not needed because I imported fips_conversion instead
 def rename_county(df):
     # 6111 Ventura County, 6059  Orange County, 6037 Los Angeles County 
     df = df.rename(columns={6111.0: 'ventura_county',6059.0: 'orange_county',
