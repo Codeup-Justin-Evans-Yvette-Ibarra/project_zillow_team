@@ -114,8 +114,11 @@ def zillow_prep(df):
     # Converts FIPS code to State and County and pivot to categorical features by county
     df = fips_conversion(df)
 
-    # rename dummy county to matching county name
-    #df = rename_county(df)
+    # Rearange Columns for Human Readability
+    df = rearange_columns(df)
+
+    # Rename Columns
+    df = rename_columns(df)
 
     #--------------- DROP NULL/NaN ---------------#
 
@@ -206,9 +209,7 @@ def encode_features(df):
     df.decktypeid = np.where(df["decktypeid"] > 0, 1, 0)
     df.garagecarcnt = np.where(df["garagecarcnt"] > 0, 1, 0)
     df.optional_features = df.optional_features.replace({False:0, True: 1})
-    # [QMCBT] I commented these out because "county" doesn't exist yet?
-    # temp = pd.get_dummies(df['county'], drop_first=False)
-    # df = pd.concat([df, temp],axis =1)
+ 
     return df 
 
 def fips_conversion(df):
@@ -235,64 +236,96 @@ def fips_conversion(df):
 
     return df
 
-# [QMCBT] This function is not needed because I imported fips_conversion instead
-def rename_county(df):
-    # 6111 Ventura County, 6059  Orange County, 6037 Los Angeles County 
-    df = df.rename(columns={6111.0: 'ventura_county',6059.0: 'orange_county',
-            6037: 'los_angeles_county'}) 
+def rearange_columns(df):
+    """
+    REARANGE Columns for Human Readability.  
+    The following columns were dropped by not adding them into the rearrange assignment.
+
+'id', 
+'garagetotalsqft', 
+'poolsizesum',
+'pooltypeid10', 
+'pooltypeid2', 
+'pooltypeid7',
+'propertycountylandusecode', 
+'propertylandusetypeid',
+'roomcnt',
+'numberofstories', 
+'assessmentyear', 
+'transaction_date', 
+'land_use', 
+    """
+
+    df = df[['parcelid',
+            'bedroomcnt',
+            'bathroomcnt', 
+            'calculatedbathnbr', 
+            'fullbathcnt',
+            'age', 
+            'yearbuilt', 
+            'basementsqft', 
+            'decktypeid', 
+            'fireplacecnt', 
+            'garagecarcnt', 
+            'hashottuborspa', 
+            'poolcnt', 
+            'optional_features', 
+            'taxdelinquencyyear', 
+            'fips',
+            'state', 
+            'name',
+            'Los Angeles County', 
+            'Orange County', 
+            'Ventura County',
+            'longitude', 
+            'latitude',
+            'regionidzip', 
+            'regionidcounty', 
+            'rawcensustractandblock', 
+            'censustractandblock', 
+            'calculatedfinishedsquarefeet',
+            'finishedsquarefeet12',
+            'lotsizesquarefeet', 
+            'structuretaxvaluedollarcnt',
+            'taxvaluedollarcnt', 
+            'landtaxvaluedollarcnt',
+            'taxamount', 
+            'log_error',]]
+
     return df
-####################################### NULL VALUES ############################################
-def null_counter(df):
-    ''' null_counter takes in a dataframe anc calculates the percent and amount of null cells in each column and row
-    returns a dataframe with the results'''
-    # name of dataframe names
-    new_columns = ['name', 'num_rows_missing', 'pct_rows_missing']
-    
-    # create data frame
-    new_df = pd.DataFrame(columns = new_columns)
-   
-    # for loop to calculate missing /percent by columns
-    for col in list(df.columns):
-        num_missing = df[col].isna().sum()
-        pct_missing = num_missing / df.shape[0]
-        
-        # create data frame
-        add_df = pd.DataFrame([{'name': col,
-                               'num_rows_missing': num_missing,
-                               'pct_rows_missing': pct_missing}])
-       
-        # concat and index by row by seting axis to 0   
-        new_df = pd.concat([new_df, add_df], axis = 0)
-        
-    # sets the index name
-    new_df.set_index('name', inplace = True)
-    
-    return new_df
 
-def null_dropper(df,prop_required_column,prop_required_row):
+def rename_columns(df):
+    """
+    This Function renames the Binary Categorical Columns to better identify them.
+    It also renames several Features to be more Human Readable and less cumbersome to call.
+    """
 
-    ''' null_dropper takes in a dataframe a percent of required columns and rows to keep columns.
-    all columns and rows outside of the null threshold will be dropped
-    returns a clean dataframe dropped nulls'''
-    
-    # this is a decimal = 1- decimal
-    prop_null_column = 1-prop_required_column
-    
-    # for columns, check null percentage and drop if a certain proportion is null (set by definition)
-    for col in list(df.columns):
-        null_sum = df[col].isna().sum()
-        null_pct = null_sum / df.shape[0]
-        
-        if null_pct > prop_null_column:
-            df.drop(columns = col, inplace = True)
-    
-    # for rows, drop if a certain proportion is null. (set by definition)
-    row_threshold = int(prop_required_row * df.shape[1])
-    
-    df.dropna(axis = 0, thresh=row_threshold, inplace = True)
-    
+    #### Rename Binary Categoricals
+    df.rename(columns = {'hashottuborspa': 'has_hottuborspa',
+                        'taxdelinquencyyear': 'has_taxdelinquency', 
+                        'basementsqft': 'has_basement', 
+                        'poolcnt': 'has_pool', 
+                        'decktypeid': 'has_deck',
+                        'fireplacecnt': 'has_fireplace',
+                        'garagecarcnt': 'has_garage',
+                        'Las Angele County': 'las_angeles',
+                        'Ventura County': 'ventura',
+                        'Orange County': 'orange'}
+            , inplace = True)
+
+    #### Rename Human Readable
+    df.rename(columns = {'name': 'county',
+                        'bedroomcnt': 'bedrooms',
+                        'bathroomcnt': 'bathrooms',
+                        'structuretaxvaluedollarcnt': 'tax_value_bldg',
+                        'taxvaluedollarcnt': 'tax_value',
+                        'landtaxvaluedollarcnt': 'tax_value_land',
+                        'regionidzip': 'zipcode',
+                        'lotsizesquarefeet': 'lot_sqft',
+                        'calculatedfinishedsquarefeet': 'sqft'}
+            , inplace = True)
+
     return df
-
 
 ###################################### Split Data
 
