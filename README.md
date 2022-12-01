@@ -67,5 +67,5 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 * 
 
 # Recommendations
-
+..........
 
