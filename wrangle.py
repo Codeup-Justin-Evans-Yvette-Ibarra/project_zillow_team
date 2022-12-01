@@ -71,19 +71,19 @@ def get_zillow_data(new = False):
     This function checks for a local file and reads it in as a Datafile.  If the csv file does not exist, it calls the new_wrangle function then writes the data to a csv file.
     '''
    
-        filename = 'zillow.csv'
+    filename = 'zillow.csv'
 
-        # obtain cvs file
-        if (os.path.isfile(filename) == False) or (new == True):
-            df = fresh_zillow_data()
-            #save as csv
-            df.to_csv(filename,index=False)
+    # obtain cvs file
+    if (os.path.isfile(filename) == False) or (new == True):
+        df = fresh_zillow_data()
+    #save as csv
+    df.to_csv(filename,index=False)
 
-        #cached data
-        else:
-            df = pd.read_csv(filename)
+    #cached data
+    else:
+        df = pd.read_csv(filename)
 
-        return df
+    return df
 
 ######################### PREPARE DATA #########################
 
