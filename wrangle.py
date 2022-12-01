@@ -3,6 +3,10 @@
 import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+
 
 from sklearn.model_selection import train_test_split
 
@@ -76,8 +80,8 @@ def get_zillow_data(new = False):
     # obtain cvs file
     if (os.path.isfile(filename) == False) or (new == True):
         df = fresh_zillow_data()
-    #save as csv
-    df.to_csv(filename,index=False)
+        #save as csv
+        df.to_csv(filename,index=False)
 
     #cached data
     else:
@@ -102,10 +106,10 @@ def zillow_prep(df):
     df = convert_null_to_cat(df)
     
     # Feature Engineer: Home_age and optional_feature
-    df = new_features(df)
+    # df = new_features(df)
 
     #encode categorical features or turn to 0 & 1:
-    df = encode_features(df)
+    #df = encode_features(df)
 
     # rename dummy county to matching county name
     df = rename_county(df)
@@ -113,7 +117,7 @@ def zillow_prep(df):
     #--------------- DROP NULL/NaN ---------------#
 
     # Drop all columns with more than 19,000 NULL/NaN
-    df = df.dropna(axis='columns', thresh=19_000)
+    df = df.dropna(axis='columns', thresh = 50_000)
 
     # Drop rows with NULL/NaN since it is only 3% of DataFrame 
     df = df.dropna()
@@ -175,7 +179,7 @@ def convert_null_to_cat(df):
                           'garagecarcnt', 
                           'garagetotalsqft']
 
-    df = df[columns_to_convert].fillna(0)
+    df[columns_to_convert] = df[columns_to_convert].fillna(0)
     
     return df
 
