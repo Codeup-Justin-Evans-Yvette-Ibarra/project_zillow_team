@@ -94,7 +94,7 @@ def create_cluster (X_cluster_name,train,validate, test, feature_columns,n_clust
     
     # fit in to train and create cluster
     X_cluster_name = train_scaled[feature_columns]
-    kmeans = KMeans(n_clusters=n_clusters)
+    kmeans = KMeans(n_clusters=n_clusters, random_state = 123)
     kmeans.fit(X_cluster_name)
     
 
