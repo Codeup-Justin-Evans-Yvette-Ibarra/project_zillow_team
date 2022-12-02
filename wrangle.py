@@ -104,12 +104,12 @@ def zillow_prep(df):
     
     # Replace Null with 0 to create Categorical Features
     df = convert_null_to_cat(df)
-    
-    # Feature Engineer: Home_age and optional_feature
-    df = new_features(df)
 
     #encode categorical features or turn to 0 & 1:
     df = encode_features(df)
+
+    # Feature Engineer: Home_age and optional_feature
+    df = new_features(df)
 
     # Converts FIPS code to State and County and pivot to categorical features by county
     df = fips_conversion(df)
@@ -120,7 +120,7 @@ def zillow_prep(df):
     # Rename Columns
     df = rename_columns(df)
 
-    #--------------- DROP NULL/NaN ---------------#
+      #--------------- DROP NULL/NaN ---------------#
 
     # Drop all columns with more than 19,000 NULL/NaN
     df = df.dropna(axis='columns', thresh = 50_000)
@@ -188,22 +188,7 @@ def convert_null_to_cat(df):
     df[columns_to_convert] = df[columns_to_convert].fillna(0)
     
     return df
-
-
-
-def new_features(df):
-    ''' new_features takes in dataframe'''
-    # Create a feature that shows the age of the home in 2017
-    df['age'] = 2017 - df.yearbuilt
-    
-    # Create Categorical Feature that shows count of "Optional Additions" 
-    df['optional_features'] = (df.garagecarcnt==1)|(df.decktypeid == 1)|(df.poolcnt == 1)|(df.fireplacecnt == 1)
    
-    # add absolute log_error to dataframe
-    df['abs_log_error'] = np.abs(df.log_error)
-
-    return df
-    
 def encode_features(df):
     # Replace Conditional values
     df["taxdelinquencyyear"] = np.where(df["taxdelinquencyyear"] > 0, 1, 0)
@@ -211,8 +196,21 @@ def encode_features(df):
     df.fireplacecnt = np.where(df["fireplacecnt"] > 0, 1, 0)
     df.decktypeid = np.where(df["decktypeid"] > 0, 1, 0)
     df.garagecarcnt = np.where(df["garagecarcnt"] > 0, 1, 0)
+
+    return df
+
+def new_features(df):
+    ''' new_features takes in dataframe'''
+    # Create a feature that shows the age of the home in 2017
+    df['age'] = 2017 - df.yearbuilt
+    
+    # Create Categorical Feature that shows count of "Optional Additions" 
+    df['optional_features'] = (df.garagecarcnt==1)|(df.decktypeid == 1)|(df.poolcnt == 1)|(df.fireplacecnt == 1)|(df.basementsqft == 1)|(df.hashottuborspa == 1)
     df.optional_features = df.optional_features.replace({False:0, True: 1})
  
+    # add absolute log_error to dataframe
+    df['abs_log_error'] = np.abs(df.log_error)
+
     return df 
 
 def fips_conversion(df):
@@ -330,6 +328,7 @@ def rename_columns(df):
             , inplace = True)
 
     return df
+
 
 ###################################### Split Data
 
