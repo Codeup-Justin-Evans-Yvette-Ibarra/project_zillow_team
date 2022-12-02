@@ -10,7 +10,7 @@ from sklearn.cluster import KMeans
 
 
 
-
+################################ scaled data ####################################################
 def scale_data(train, 
                validate, 
                test, 
@@ -66,7 +66,7 @@ def scale_data(train,
 
 
 
-
+############################################# cluster ###############################################
 
 def create_cluster (X_cluster_name,train,validate, test, feature_columns,n_clusters=3):
     ''' create_cluster takes in 
@@ -87,10 +87,13 @@ def create_cluster (X_cluster_name,train,validate, test, feature_columns,n_clust
     name= X_cluster_name
     
     # scaled the data
+    columns_to_scale = ['longitude','latitude','age','bedrooms',
+    'bathrooms', 'yearbuilt','optional_features', 'sqft',
+    'lot_sqft','taxamount','tax_value','tax_value_bldg','tax_value_land']
     train_scaled, validate_scaled, test_scaled = scale_data(train, 
                validate, 
                test, 
-               feature_columns)
+               columns_to_scale)
     
     # fit in to train and create cluster
     X_cluster_name = train_scaled[feature_columns]
@@ -137,8 +140,32 @@ def create_cluster (X_cluster_name,train,validate, test, feature_columns,n_clust
     test_scaled = pd.concat([test_scaled, temp],axis=1)
     
 
-
-    
-    
-    
     return train, validate, test, train_scaled, validate_scaled, test_scaled
+
+
+    ################################ seperate target, split #############################################
+
+def model_data_prep(train_scaled, validate_scaled,test_scaled, features_to_model):
+    '''model_data_prep takes in train validate,test and scales using scale_data and sets up
+    features and target ready for modeling
+    '''
+    train1 = train_scaled[features_to_model]
+    validate1 = validate_scaled[features_to_model]
+    test1 = test_scaled[features_to_model]
+    
+    X_train_scaled = train1
+    X_validate_scaled = validate1
+    X_test_scaled =test1
+
+
+    # Setup X and y
+    X_train_scaled = X_train_scaled.drop(columns=['log_error'])
+    y_train = train1.log_error
+
+    X_validate_scaled = X_validate_scaled.drop(columns=['log_error'])
+    y_validate = validate1.log_error
+
+    X_test_scaled = X_test_scaled.drop(columns=['log_error'])
+    y_test = test1.log_error
+    
+    return X_train_scaled,y_train, X_validate_scaled,y_validate, X_test_scaled, y_test
