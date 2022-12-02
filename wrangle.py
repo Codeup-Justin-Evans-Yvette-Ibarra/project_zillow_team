@@ -198,7 +198,10 @@ def new_features(df):
     
     # Create Categorical Feature that shows count of "Optional Additions" 
     df['optional_features'] = (df.garagecarcnt==1)|(df.decktypeid == 1)|(df.poolcnt == 1)|(df.fireplacecnt == 1)
-    
+   
+    # add absolute log_error to dataframe
+    df['abs_log_error'] = np.abs(df.log_error)
+
     return df
     
 def encode_features(df):
@@ -290,7 +293,8 @@ def rearange_columns(df):
             'taxvaluedollarcnt', 
             'landtaxvaluedollarcnt',
             'taxamount', 
-            'log_error',]]
+            'log_error',
+            'abs_log_error']]
 
     return df
 
@@ -356,7 +360,7 @@ def split(df, target_var):
     # create y_test by keeping only the target variable.
     y_test = test[[target_var]]
 
-    return train, X_train, X_validate, X_test, y_train, y_validate, y_test
+    return train,validate, test, X_train, X_validate, X_test, y_train, y_validate, y_test
 
 
 ######################### SCALE SPLIT #########################
