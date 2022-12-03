@@ -196,6 +196,13 @@ def make_metric_df(y, y_pred, model_name, metric_df):
                     y_pred)
             }, ignore_index=True)
 
+
+
+##################################### modeling 1###################
+
+
+
+
 def modeling(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scaled, y_test):    
     model = LinearRegression().fit(X_train_scaled, y_train)
     predictions = model.predict(X_train_scaled)
@@ -235,10 +242,10 @@ def modeling(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scale
 
     # evaluate: rmse
     rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_pred_lm) ** (1/2)
-
-    print("RMSE for OLS using LinearRegression\nTraining/In-Sample: ", rmse_train,"\nValidation/Out-of-Sample: ", rmse_validate)
+    print('Features set 1')
+    print("RMSE for F1: OLS using LinearRegression\nTraining/In-Sample: ", rmse_train,"\nValidation/Out-of-Sample: ", rmse_validate)
     metric_df = metric_df.append({
-        'model': 'OLS Regressor', 
+        'model': 'F1: OLS Regressor', 
         'RMSE_validate': rmse_validate,
         'r^2_validate': explained_variance_score(y_validate.log_error, y_validate.logerror_pred_mean)}, ignore_index=True)
 
@@ -278,6 +285,120 @@ def modeling(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scale
     print("RMSE for Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, "\nValidation/Out-of-Sample: ", rmse_validate)
 
     # append to metric df
-    metric_df = make_metric_df(y_validate.log_error, y_validate.log_pred_lm2,'degree2',metric_df)
+    metric_df = make_metric_df(y_validate.log_error, y_validate.log_pred_lm2,'F1: degree2',metric_df)
+
+    return metric_df[['model', 'RMSE_validate']]
+
+
+################################################ model prep and models 2#########################
+
+def model_data_prep2(train_scaled, validate_scaled,test_scaled, features_to_model):
+    '''model_data_prep takes in train validate,test and scales using scale_data and sets up
+    features and target ready for modeling
+    '''
+    train1 = train_scaled[features_to_model]
+    validate1 = validate_scaled[features_to_model]
+    test1 = test_scaled[features_to_model]
+    
+    X_train_scaled = train1
+    X_validate_scaled = validate1
+    X_test_scaled =test1
+
+
+    # Setup X and y
+    X_train_scaled = X_train_scaled.drop(columns=['log_error'])
+    y_train = train1.log_error
+
+    X_validate_scaled = X_validate_scaled.drop(columns=['log_error'])
+    y_validate = validate1.log_error
+
+    X_test_scaled = X_test_scaled.drop(columns=['log_error'])
+    y_test = test1.log_error
+    
+    return X_train_scaled,y_train, X_validate_scaled,y_validate, X_test_scaled, y_test
+
+def modeling2(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scaled, y_test):    
+    model = LinearRegression().fit(X_train_scaled, y_train)
+    predictions = model.predict(X_train_scaled)
+
+    #  y_train and y_validate to be dataframes to append the new columns with predicted values. 
+    y_train = pd.DataFrame(y_train)
+    y_validate = pd.DataFrame(y_validate)
+    
+    # 1. Predict log_pred_mean
+    log_pred_mean = y_train.log_error.mean()
+    y_train['logerror_pred_mean'] = log_pred_mean
+    y_validate['logerror_pred_mean'] =log_pred_mean
+
+    # 2. RMSE of log_pred_mean
+    rmse_train = mean_squared_error(y_train.log_error,y_train.logerror_pred_mean) ** .5
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.logerror_pred_mean) ** (1/2)
+
+    
+    
+    # create the metric_df as a blank dataframe
+    metric_df = pd.DataFrame()
+    # make our first entry into the metric_df with median baseline
+    metric_df = make_metric_df(y_train.log_error,
+                               y_train.logerror_pred_mean,
+                               'mean_baseline',
+                              metric_df)
+
+    
+    # Simple Model
+    lm = LinearRegression(normalize=True)
+    lm.fit(X_train_scaled, y_train.log_error)
+    y_train['log_pred_lm'] = lm.predict(X_train_scaled)
+    rmse_train = mean_squared_error(y_train.log_error, y_train.log_pred_lm) ** (1/2)
+
+    # predict validate
+    y_validate['log_pred_lm'] = lm.predict(X_validate_scaled)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_pred_lm) ** (1/2)
+    print ('Features Set 2')
+    print("RMSE for F2: OLS using LinearRegression\nTraining/In-Sample: ", rmse_train,"\nValidation/Out-of-Sample: ", rmse_validate)
+    metric_df = metric_df.append({
+        'model': 'F2: OLS Regressor', 
+        'RMSE_validate': rmse_validate,
+        'r^2_validate': explained_variance_score(y_validate.log_error, y_validate.logerror_pred_mean)}, ignore_index=True)
+
+    print('_______________')
+    
+    
+    #Polynomial 2 degrees
+    # make the polynomial features to get a new set of features
+    pf = PolynomialFeatures(degree=2)
+
+    # fit and transform X_train_scaled
+    X_train_degree2 = pf.fit_transform(X_train_scaled)
+
+    # transform X_validate_scaled & X_test_scaled
+    X_validate_degree2 = pf.transform(X_validate_scaled)
+    X_test_degree2 =  pf.transform(X_test_scaled)
+
+    # create the model object
+    lm2 = LinearRegression(normalize=True)
+
+    # fit the model to our training data. We must specify the column in y_train, 
+    # since we have converted it to a dataframe from a series! 
+    lm2.fit(X_train_degree2, y_train.log_error)
+
+    # predict train
+    y_train['log_pred_lm2'] = lm2.predict(X_train_degree2)
+
+    # evaluate: rmse
+    rmse_train = mean_squared_error(y_train.log_error, y_train.log_pred_lm2) ** (1/2)
+
+    # predict validate
+    y_validate['log_pred_lm2'] = lm2.predict(X_validate_degree2)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_pred_lm2) ** 0.5
+
+    print("RMSE for F2: Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, "\nValidation/Out-of-Sample: ", rmse_validate)
+
+    # append to metric df
+    metric_df = make_metric_df(y_validate.log_error, y_validate.log_pred_lm2,'F2: degree2',metric_df)
 
     return metric_df[['model', 'RMSE_validate']]
