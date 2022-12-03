@@ -3,9 +3,10 @@ import pandas as pd
 import seaborn as sns
 
 import matplotlib.pyplot as plt
-
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.metrics import mean_squared_error,explained_variance_score
 from sklearn.preprocessing import MinMaxScaler
-
+from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
 
 
@@ -124,7 +125,7 @@ def create_cluster (X_cluster_name,train,validate, test, feature_columns,n_clust
     
     # Create seperate catagorical features for each cluster in train_scaled
     temp = pd.get_dummies(validate_scaled[name], drop_first=False).rename(columns=lambda x:f'{name}_'+str(x))
-    validate_scaled = pd.concat([train_scaled, temp],axis=1)
+    validate_scaled = pd.concat([validate_scaled, temp],axis=1)
     
     # save cluser into test_scaled and test
     X_cluster_name = test_scaled[feature_columns]
@@ -169,3 +170,114 @@ def model_data_prep(train_scaled, validate_scaled,test_scaled, features_to_model
     y_test = test1.log_error
     
     return X_train_scaled,y_train, X_validate_scaled,y_validate, X_test_scaled, y_test
+
+def make_metric_df(y, y_pred, model_name, metric_df):
+    if metric_df.size ==0:
+        metric_df = pd.DataFrame(data=[
+            {
+                'model': model_name, 
+                'RMSE_validate': mean_squared_error(
+                    y,
+                    y_pred) ** .5,
+                'r^2_validate': explained_variance_score(
+                    y,
+                    y_pred)
+            }])
+        return metric_df
+    else:
+        return metric_df.append(
+            {
+                'model': model_name, 
+                'RMSE_validate': mean_squared_error(
+                    y,
+                    y_pred) ** .5,
+                'r^2_validate': explained_variance_score(
+                    y,
+                    y_pred)
+            }, ignore_index=True)
+
+def modeling(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scaled, y_test):    
+    model = LinearRegression().fit(X_train_scaled, y_train)
+    predictions = model.predict(X_train_scaled)
+
+    #  y_train and y_validate to be dataframes to append the new columns with predicted values. 
+    y_train = pd.DataFrame(y_train)
+    y_validate = pd.DataFrame(y_validate)
+    
+    # 1. Predict log_pred_mean
+    log_pred_mean = y_train.log_error.mean()
+    y_train['logerror_pred_mean'] = log_pred_mean
+    y_validate['logerror_pred_mean'] =log_pred_mean
+
+    # 2. RMSE of log_pred_mean
+    rmse_train = mean_squared_error(y_train.log_error,y_train.logerror_pred_mean) ** .5
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.logerror_pred_mean) ** (1/2)
+
+    
+    
+    # create the metric_df as a blank dataframe
+    metric_df = pd.DataFrame()
+    # make our first entry into the metric_df with median baseline
+    metric_df = make_metric_df(y_train.log_error,
+                               y_train.logerror_pred_mean,
+                               'mean_baseline',
+                              metric_df)
+
+    
+    # Simple Model
+    lm = LinearRegression(normalize=True)
+    lm.fit(X_train_scaled, y_train.log_error)
+    y_train['log_pred_lm'] = lm.predict(X_train_scaled)
+    rmse_train = mean_squared_error(y_train.log_error, y_train.log_pred_lm) ** (1/2)
+
+    # predict validate
+    y_validate['log_pred_lm'] = lm.predict(X_validate_scaled)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_pred_lm) ** (1/2)
+
+    print("RMSE for OLS using LinearRegression\nTraining/In-Sample: ", rmse_train,"\nValidation/Out-of-Sample: ", rmse_validate)
+    metric_df = metric_df.append({
+        'model': 'OLS Regressor', 
+        'RMSE_validate': rmse_validate,
+        'r^2_validate': explained_variance_score(y_validate.log_error, y_validate.logerror_pred_mean)}, ignore_index=True)
+
+    print('_______________')
+    
+    
+    #Polynomial 2 degrees
+    # make the polynomial features to get a new set of features
+    pf = PolynomialFeatures(degree=2)
+
+    # fit and transform X_train_scaled
+    X_train_degree2 = pf.fit_transform(X_train_scaled)
+
+    # transform X_validate_scaled & X_test_scaled
+    X_validate_degree2 = pf.transform(X_validate_scaled)
+    X_test_degree2 =  pf.transform(X_test_scaled)
+
+    # create the model object
+    lm2 = LinearRegression(normalize=True)
+
+    # fit the model to our training data. We must specify the column in y_train, 
+    # since we have converted it to a dataframe from a series! 
+    lm2.fit(X_train_degree2, y_train.log_error)
+
+    # predict train
+    y_train['log_pred_lm2'] = lm2.predict(X_train_degree2)
+
+    # evaluate: rmse
+    rmse_train = mean_squared_error(y_train.log_error, y_train.log_pred_lm2) ** (1/2)
+
+    # predict validate
+    y_validate['log_pred_lm2'] = lm2.predict(X_validate_degree2)
+
+    # evaluate: rmse
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_pred_lm2) ** 0.5
+
+    print("RMSE for Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, "\nValidation/Out-of-Sample: ", rmse_validate)
+
+    # append to metric df
+    metric_df = make_metric_df(y_validate.log_error, y_validate.log_pred_lm2,'degree2',metric_df)
+
+    return metric_df[['model', 'RMSE_validate']]
