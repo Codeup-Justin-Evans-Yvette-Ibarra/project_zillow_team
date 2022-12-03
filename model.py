@@ -402,3 +402,61 @@ def modeling2(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scal
     metric_df = make_metric_df(y_validate.log_error, y_validate.log_pred_lm2,'F2: degree2',metric_df)
 
     return metric_df[['model', 'RMSE_validate']]
+
+    ########################### Test################################################
+
+def test_modeling2(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scaled, y_test):    
+    model = LinearRegression().fit(X_train_scaled, y_train)
+    predictions = model.predict(X_train_scaled)
+
+    #  y_train and y_validate to be dataframes to append the new columns with predicted values. 
+    y_train = pd.DataFrame(y_train)
+    y_validate = pd.DataFrame(y_validate)
+    y_test = pd.DataFrame(y_test)
+    
+    # 1. Predict log_pred_mean
+    log_pred_mean = y_train.log_error.mean()
+    y_train['logerror_pred_mean'] = log_pred_mean
+    y_validate['logerror_pred_mean'] =log_pred_mean
+    y_test['logerror_pred_mean']=log_pred_mean
+    
+    # 2. RMSE of log_pred_mean
+    rmse_train = mean_squared_error(y_train.log_error,y_train.logerror_pred_mean) ** .5
+    rmse_validate = mean_squared_error(y_validate.log_error, y_validate.logerror_pred_mean) ** (1/2)
+    rmse_test= mean_squared_error(y_test.log_error, y_test.logerror_pred_mean) ** (1/2)
+    
+    
+    # create the metric_df as a blank dataframe
+    metric_test = pd.DataFrame()
+    # make our first entry into the metric_df with median baseline
+    metric_test = make_metric_df(y_train.log_error,
+                               y_train.logerror_pred_mean,
+                               'mean_baseline',
+                              metric_test)
+
+    
+    # Simple Model
+    lm = LinearRegression(normalize=True)
+    lm.fit(X_train_scaled, y_train.log_error)
+    y_train['log_pred_lm'] = lm.predict(X_train_scaled)
+    rmse_train = mean_squared_error(y_train.log_error, y_train.log_pred_lm) ** (1/2)
+    # predict validate
+    y_train['log_pred_lm'] = lm.predict(X_train_scaled)
+    
+    # predict validate
+    y_validate['log_pred_lm'] = lm.predict(X_validate_scaled)
+    
+    # predict test
+    y_test['log_pred_lm'] = lm.predict(X_test_scaled)
+    
+     # append to metric df
+    metric_test = make_metric_df(y_train.log_error, y_train.log_pred_lm,'Train F2: degree2',metric_test)
+    
+    
+    # append to metric df
+    metric_test = make_metric_df(y_validate.log_error, y_validate.log_pred_lm,'Validate F2: degree2',metric_test)
+    
+    # append to metric df
+    metric_test = make_metric_df(y_test.log_error, y_test.log_pred_lm,'Test F2: degree2',metric_test)
+    
+    return metric_test
