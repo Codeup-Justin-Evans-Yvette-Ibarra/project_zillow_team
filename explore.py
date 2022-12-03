@@ -44,7 +44,8 @@ def Q2_test_1(df):
     else:
         print('Fail to reject the null hypothesis')
     
-    return t,p_val
+    print(f't-stat {t}')
+    print(f'p-value {p_val}')
 
 def pearson_r(df, sample_1, sample_2):
     """
@@ -56,8 +57,11 @@ def pearson_r(df, sample_1, sample_2):
         print('Reject the null hypothesis')
     else:
         print('Fail to reject the null hypothesis')
-    
-    return r, p_val
+    r= r.round(4)
+    p_val = p_val.round(4)
+    print(f'correlation {r}')
+    print(f'p-value {p_val}')
+
 
 ################################### delinquency vs log error #####################################
 def get_loliplot_delinquency(train):
@@ -90,7 +94,7 @@ def get_loliplot_delinquency(train):
     plt.xticks(loli['Tax Delinquency'],fontsize = 14)
     plt.yticks(fontsize = 15 )
     axes.set_yticks(ticks=[0,0.010, 0.020,0.030,0.040])
-    axes.set_xticks(ticks=[0,1])
+    axes.set_xticks(ticks=[0,1]);
 
 
 ################################# stat test
@@ -119,11 +123,20 @@ def get_ttest_delinquency(df):
     # perform t-test
     t_stat, p_val = stats.ttest_ind(subset_no_feature.log_error, subset_feature.log_error,equal_var=variance,random_state=123)
     
-    # round  and print results, divide p by 2
+    # print hypotheis status
+    if p_val/2 < alpha:
+        print('Reject the null hypothesis')
+    else:
+        print('Fail to reject the null hypothesis')
+    print('_____________________')  
+
+    # round  and print results, divide p by 2  
     t_stat = t_stat.round(4)
     p_val = (p_val.round(4))/2
     print(f't-stat {t_stat}')
     print(f'p-value {p_val}')
+
+
 
 ################################################ home age vs log_error
 def get_scatterplot_age(train):   
@@ -165,8 +178,47 @@ def get_ttest_age(train):
     # perform t-test
     t_stat, p_val = stats.ttest_ind(subset_older.log_error, subset_younger.log_error,equal_var=variance,random_state=123)
     
-    # round  and print results, divide p by 2
+    # print hypotheis status
+    if p_val/2 < alpha:
+        print('Reject the null hypothesis')
+    else:
+        print('Fail to reject the null hypothesis')
+    print('_____________________')  
+
+    # round  and print results, divide p by 2  
     t_stat = t_stat.round(4)
     p_val = (p_val.round(4))/2
     print(f't-stat {t_stat}')
     print(f'p-value {p_val}')
+
+############################################### group subclusters######################
+
+def group_clusters(train):    
+    plt.figure(figsize=(18, 6))
+
+    # subplot #1
+    plt.subplot(131)
+    for cluster, subset in train.groupby('cluster_price_size'):
+        plt.scatter(x=subset.sqft, y=subset.log_error, label='cluster' + str(cluster), alpha=.4, )
+    plt.legend()
+    plt.xlabel('Square Feet')
+    plt.ylabel('Log Error')
+    plt.title('Cluster:Price & Size')
+    plt.legend(loc='lower right')
+    # subplot #2
+    plt.subplot(132)
+    for cluster, subset in train.groupby('cluster_delinquency_value'):
+        plt.scatter(x=subset.sqft, y=subset.log_error, label='cluster' + str(cluster), alpha=.4, )
+    plt.legend()
+    plt.xlabel('Square Feet')
+    plt.legend(loc='lower right')
+    plt.title('Cluster:Delinquency & home value')
+
+    # subplot #2
+    plt.subplot(133)
+    for cluster, subset in train.groupby('loc_clusters'):
+        plt.scatter(x=subset.sqft, y=subset.log_error, label='cluster' + str(cluster), alpha=.4, )
+    plt.legend()
+    plt.xlabel('Square Feet')
+    plt.legend(loc='lower right')
+    plt.title('Cluster:Location' );
