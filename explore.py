@@ -59,4 +59,114 @@ def pearson_r(df, sample_1, sample_2):
     
     return r, p_val
 
+################################### delinquency vs log error #####################################
+def get_loliplot_delinquency(train):
+    # create data frame for loliplot
+    loli= pd.DataFrame(
+        {'Tax Delinquency':['No Delinquency', 'Has Deliquency'],
+         'Mean Log Error':[train[train.has_taxdelinquency==0].log_error.mean(),
+                            train[train.has_taxdelinquency==1].log_error.mean()]
+        })
+    # set fig size
+    fig, axes = plt.subplots(figsize=(6,5))
+    # set font and style
+    sns.set_theme('talk')
+    sns.set_style('white')
 
+    # using subplots() to draw vertical lines
+    axes.vlines(loli['Tax Delinquency'], ymin=0, ymax=loli['Mean Log Error'],color = '#06C2AC',lw=4)
+
+
+    # drawing the markers (circle)
+    axes.plot(loli['Tax Delinquency'], loli['Mean Log Error'], "o",color ='#E79C66',markersize=13) 
+    axes.set_ylim(0)
+    axes.set_xlim(-1,2)
+
+    # formatting axis and details 
+    #plt.xlabel('')
+    plt.ylabel('Mean Log Error', fontsize =20)
+    plt.title('Log Error increases with tax delinquency',fontsize =20)
+    #axes.yaxis.set_major_formatter(ticker.EngFormatter())
+    plt.xticks(loli['Tax Delinquency'],fontsize = 14)
+    plt.yticks(fontsize = 15 )
+    axes.set_yticks(ticks=[0,0.010, 0.020,0.030,0.040])
+    axes.set_xticks(ticks=[0,1])
+
+
+################################# stat test
+def get_ttest_delinquency(df):
+    
+    
+    # create two independent sample group of customers: churn and not churn.
+    subset_no_feature =df[df.has_taxdelinquency==0]
+    subset_feature = df[df.has_taxdelinquency==1]
+
+    # # stats Levene test - returns p value. small p-value means unequal variances
+    stat, pval =stats.levene( subset_no_feature.log_error, subset_feature.log_error)
+
+
+    # high p-value suggests that the populations have equal variances
+    if pval < 0.05:
+        variance = False
+      
+    else:
+        variance = True
+        
+
+    # set alpha to 0.05
+    alpha = 0.05
+
+    # perform t-test
+    t_stat, p_val = stats.ttest_ind(subset_no_feature.log_error, subset_feature.log_error,equal_var=variance,random_state=123)
+    
+    # round  and print results, divide p by 2
+    t_stat = t_stat.round(4)
+    p_val = (p_val.round(4))/2
+    print(f't-stat {t_stat}')
+    print(f'p-value {p_val}')
+
+################################################ home age vs log_error
+def get_scatterplot_age(train):   
+    sns.scatterplot(y='age', x='log_error',
+                    data=train[train.age<= 81], color='#06C2AC')
+
+    sns.scatterplot(y='age', x='log_error',
+                   data=train[train.age> 81], 
+                   color='#E79C66')
+
+
+    plt.title("Does yearbuilt  make a diffirence? ")
+    plt.show()
+
+
+################################# stats test
+def get_ttest_age(train):
+    
+    
+    # create two independent sample group of customers: churn and not churn.
+    subset_older =train[train.age> 81]
+    subset_younger = train[train.age<= 81]
+
+    # # stats Levene test - returns p value. small p-value means unequal variances
+    stat, pval =stats.levene( subset_older.log_error, subset_younger.log_error)
+
+
+    # high p-value suggests that the populations have equal variances
+    if pval < 0.05:
+        variance = False
+      
+    else:
+        variance = True
+        
+
+    # set alpha to 0.05
+    alpha = 0.05
+
+    # perform t-test
+    t_stat, p_val = stats.ttest_ind(subset_older.log_error, subset_younger.log_error,equal_var=variance,random_state=123)
+    
+    # round  and print results, divide p by 2
+    t_stat = t_stat.round(4)
+    p_val = (p_val.round(4))/2
+    print(f't-stat {t_stat}')
+    print(f'p-value {p_val}')
