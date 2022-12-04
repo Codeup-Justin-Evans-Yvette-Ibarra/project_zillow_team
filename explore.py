@@ -7,20 +7,80 @@ import matplotlib.pyplot as plt
  
 
 def Q1_viz_1(df):
-    sns.lmplot(y='longitude', x='log_error', data=df, line_kws={'color': 'red'})
-    return plt.show()
+    # Plot data and a linear regression
+    plt.figure(figsize=(20,8))
 
-def Q1_viz_2(df):
-    sns.lmplot(y='latitude', x='log_error', data=df, line_kws={'color': 'red'})
-    plt.show()
+    plt.subplot(131)
+    sns.regplot(y="longitude", 
+                x="log_error", 
+                data=df, 
+                line_kws={'color': 'red'})
+    plt.title("Longitude & Log Error") #Add plot title
+    plt.ylabel("longitude") #Adjust the label of the y-axis
+    plt.ticklabel_format(style='plain', axis='y') #repress the scientific notation
+    plt.xlabel("log_error") #Adjust the label of the x-axis
+    plt.ticklabel_format(style='plain', axis='x') #repress the scientific notation
+    #plt.ylim(0,100) #Adjust the limits of the y-axis
+    #plt.xlim(0,10) #Adjust the limits of the x-axis
+    plt.tight_layout() #Adjust subplot params
+
+    plt.subplot(132)
+    sns.regplot(y="latitude", 
+                x="log_error", 
+                data=df, 
+                line_kws={'color': 'red'})
+    plt.title("Latitude & Log Error") #Add plot title
+    plt.ylabel("latitude") #Adjust the label of the y-axis
+    plt.ticklabel_format(style='plain', axis='y') #repress the scientific notation
+    plt.xlabel("log_error") #Adjust the label of the x-axis#plt.ylim(0,100) #Adjust the limits of the y-axis
+    plt.ticklabel_format(style='plain', axis='x') #repress the scientific notation
+    #plt.xlim(0,10) #Adjust the limits of the x-axis
+    plt.tight_layout() #Adjust subplot params
+
+    plt.subplot(133)
+    sns.regplot(x="longitude",
+                y="latitude", 
+                data=df, 
+                line_kws={'color': 'red'})
+    plt.title("Longitude & Latitude") #Add plot title
+    plt.ylabel("latitude") #Adjust the label of the y-axis
+    plt.ticklabel_format(style='plain', axis='y') #repress the scientific notation
+    plt.xlabel("longitude") #Adjust the label of the x-axis
+    plt.ticklabel_format(style='plain', axis='x') #repress the scientific notation
+    #plt.ylim(0,100) #Adjust the limits of the y-axis
+    #plt.xlim(0,10) #Adjust the limits of the x-axis
+    plt.tight_layout() #Adjust subplot params
+
 
 def Q2_viz_1(df):
-    sns.barplot(x='county', y='log_error', hue='loc_clusters',
-            palette='colorblind', data = df)
+    plt.figure(figsize=(20,8))
 
-def Q2_viz_2(df):
-    sns.barplot(x='loc_clusters', y='log_error', data=df)
-    plt.show()
+    plt.subplot(131)
+    sns.barplot(x ='county', 
+                y ='log_error', 
+                hue ='loc_clusters',
+                palette='colorblind', 
+                data = df)#, estimator=np.mean)#, ci=95)#, capsize=.2)
+    plt.title("Location Clusters by county on logerror") #Add plot title
+    plt.ylabel("logerror") #Adjust the label of the y-axis
+    plt.xlabel("county") #Adjust the label of the x-axis
+    
+    plt.subplot(132)
+    sns.barplot(x ='loc_clusters', 
+                y ='log_error', 
+                data = df)
+    plt.title("Bar Plot: Log Error of Location Clusters") #Add plot title
+    plt.ylabel("logerror") #Adjust the label of the y-axis
+    plt.xlabel("Location Clusters") #Adjust the label of the x-axis
+    
+    plt.subplot(133)
+    sns.stripplot(x = "loc_clusters",
+                  y = "log_error", 
+                  data = df) 
+    plt.title("Strip Plot: Log Error of Location Clusters") #Add plot title
+    plt.ylabel("logerror") #Adjust the label of the y-axis
+    plt.xlabel("loc_clusters") #Adjust the label of the x-axis
+    
 
 def split_stats(df, train, validate, test):
     train_prcnt = round((train.shape[0] / df.shape[0]), 2)*100
@@ -33,7 +93,7 @@ def split_stats(df, train, validate, test):
     print(f'   Validate: {validate.shape} - {validate_prcnt}%')
     print(f'       Test: {test.shape} - {test_prcnt}%')
 
-def Q2_test_1(df):
+def Q2_kruskal_test_1(df):
     alpha = 0.05
 
     group_list = [df[df.loc_clusters == x].log_error.to_numpy() for x in range(5)]
@@ -43,9 +103,9 @@ def Q2_test_1(df):
         print('Reject the null hypothesis')
     else:
         print('Fail to reject the null hypothesis')
-    
-    print(f't-stat {t}')
-    print(f'p-value {p_val}')
+    print('_____________________')  
+    print(f't-stat {t.round(4)}')
+    print(f'p-value {p_val.round(4)}')
 
 def pearson_r(df, sample_1, sample_2):
     """
@@ -59,6 +119,7 @@ def pearson_r(df, sample_1, sample_2):
         print('Fail to reject the null hypothesis')
     r= r.round(4)
     p_val = p_val.round(4)
+    print('_____________________')  
     print(f'correlation {r}')
     print(f'p-value {p_val}')
 
@@ -101,7 +162,7 @@ def get_loliplot_delinquency(train):
 def get_ttest_delinquency(df):
     
     
-    # create two independent sample group of customers: churn and not churn.
+    # create two independent sample groups of customers: has_taxdelinquency True (=1) and False (=0).
     subset_no_feature =df[df.has_taxdelinquency==0]
     subset_feature = df[df.has_taxdelinquency==1]
 
@@ -205,6 +266,7 @@ def group_clusters(train):
     plt.ylabel('Log Error')
     plt.title('Cluster:Price & Size')
     plt.legend(loc='lower right')
+    
     # subplot #2
     plt.subplot(132)
     for cluster, subset in train.groupby('cluster_delinquency_value'):
@@ -214,7 +276,7 @@ def group_clusters(train):
     plt.legend(loc='lower right')
     plt.title('Cluster:Delinquency & home value')
 
-    # subplot #2
+    # subplot #3
     plt.subplot(133)
     for cluster, subset in train.groupby('loc_clusters'):
         plt.scatter(x=subset.sqft, y=subset.log_error, label='cluster' + str(cluster), alpha=.4, )
