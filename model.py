@@ -403,6 +403,10 @@ def modeling2(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scal
 
     return metric_df[['model', 'RMSE_validate']]
 
+def metric_concat(metric1, metric2):
+    metric=pd.concat([metric1,metric2],ignore_index=True)
+    return metric
+
     ########################### Test################################################
 
 def test_modeling2(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scaled, y_test):    

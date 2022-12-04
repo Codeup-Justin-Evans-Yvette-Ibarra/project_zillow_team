@@ -41,17 +41,7 @@ def Q1_viz_1(df):
 def Q2_viz_1(df):
     plt.figure(figsize=(20,8))
 
-    plt.subplot(131)
-    sns.barplot(x ='county', 
-                y ='log_error', 
-                hue ='loc_clusters',
-                palette='colorblind', 
-                data = df)#, estimator=np.mean)#, ci=95)#, capsize=.2)
-    plt.title("Location Clusters by county on logerror") #Add plot title
-    plt.ylabel("logerror") #Adjust the label of the y-axis
-    plt.xlabel("county") #Adjust the label of the x-axis
-    
-    plt.subplot(132)
+    plt.subplot(121)
     sns.barplot(x ='loc_clusters', 
                 y ='log_error', 
                 data = df)
@@ -59,7 +49,7 @@ def Q2_viz_1(df):
     plt.ylabel("logerror") #Adjust the label of the y-axis
     plt.xlabel("Location Clusters") #Adjust the label of the x-axis
     
-    plt.subplot(133)
+    plt.subplot(122)
     sns.stripplot(x = "loc_clusters",
                   y = "log_error", 
                   data = df) 
