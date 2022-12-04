@@ -10,7 +10,7 @@ def Q1_viz_1(df):
     # Plot data and a linear regression
     plt.figure(figsize=(20,8))
 
-    plt.subplot(131)
+    plt.subplot(121)
     sns.regplot(y="longitude", 
                 x="log_error", 
                 data=df, 
@@ -24,7 +24,7 @@ def Q1_viz_1(df):
     #plt.xlim(0,10) #Adjust the limits of the x-axis
     plt.tight_layout() #Adjust subplot params
 
-    plt.subplot(132)
+    plt.subplot(122)
     sns.regplot(y="latitude", 
                 x="log_error", 
                 data=df, 
@@ -34,20 +34,6 @@ def Q1_viz_1(df):
     plt.ticklabel_format(style='plain', axis='y') #repress the scientific notation
     plt.xlabel("log_error") #Adjust the label of the x-axis#plt.ylim(0,100) #Adjust the limits of the y-axis
     plt.ticklabel_format(style='plain', axis='x') #repress the scientific notation
-    #plt.xlim(0,10) #Adjust the limits of the x-axis
-    plt.tight_layout() #Adjust subplot params
-
-    plt.subplot(133)
-    sns.regplot(x="longitude",
-                y="latitude", 
-                data=df, 
-                line_kws={'color': 'red'})
-    plt.title("Longitude & Latitude") #Add plot title
-    plt.ylabel("latitude") #Adjust the label of the y-axis
-    plt.ticklabel_format(style='plain', axis='y') #repress the scientific notation
-    plt.xlabel("longitude") #Adjust the label of the x-axis
-    plt.ticklabel_format(style='plain', axis='x') #repress the scientific notation
-    #plt.ylim(0,100) #Adjust the limits of the y-axis
     #plt.xlim(0,10) #Adjust the limits of the x-axis
     plt.tight_layout() #Adjust subplot params
 
