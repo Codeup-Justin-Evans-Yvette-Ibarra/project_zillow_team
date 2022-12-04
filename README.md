@@ -78,10 +78,7 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |:----------|:-----------------|
 |fips|Federal Information Processing Standards (FIPS), now known as Federal Information Processing Series, are numeric codes assigned by the National Institute of Standards and Technology (NIST). Typically, FIPS codes deal with US states and counties. US states are identified by a 2-digit number, while US counties are identified by a 3-digit number. For example, a FIPS code of 06111, represents California -06 and Ventura County -111.|
 |state|This is the two letter abbreviation for the State as defined by the FIPS code| 
-|county|FIPS code for california counties:|
-|6037|Los Angeles County| 
-|6059|Orange County| 
-|6111|Ventura County|
+|county|FIPS code for california counties|
 |la_county|fips: 6037; Categorical Binary Feature for Los Angeles County (if True = 1)| 
 |orange_county|fips: 6059; Categorical Binary Feature for Orange County (if True = 1)| 
 |ventura_county|fips: 6111; Categorical Binary Feature for Los Angeles County (if True = 1)|
