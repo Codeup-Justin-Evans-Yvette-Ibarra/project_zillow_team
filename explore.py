@@ -80,7 +80,7 @@ def Q2_viz_1(df):
     plt.title("Strip Plot: Log Error of Location Clusters") #Add plot title
     plt.ylabel("logerror") #Adjust the label of the y-axis
     plt.xlabel("loc_clusters") #Adjust the label of the x-axis
-    
+   
 
 def split_stats(df, train, validate, test):
     train_prcnt = round((train.shape[0] / df.shape[0]), 2)*100
