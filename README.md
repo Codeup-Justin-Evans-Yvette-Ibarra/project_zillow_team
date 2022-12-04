@@ -93,7 +93,7 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |Feature    |Description           |
 |:----------|:-----------------|
 |sqft|Calculated total finished living area of the home|
-|lotsizesquarefeet|| 
+|lotsizesquarefeet|Calculated area of land lot belonging to parcel| 
 
 ## Value
 |Feature    |Description           |
