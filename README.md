@@ -120,11 +120,16 @@ Our initial thoughts are that outliers, age, and location are drivers of errors 
 
 
 # Takeaways and Conclusions
-* 
-* 
-* 
-* 
+
+* Longitude latitude and age seem to be drivers of log_error.
+* Under Cluster: Location sub-clusters 2, 3, and 4 are not driving as much error as sub-cluster 0 and sub-cluster1
+* Properties that have tax delinquency on average have a higher log error.
+* Under Cluster:Price & Size there is a grouping with a large spread of log error in sub-cluster 0 and sub-cluster 1
+
+**The final model has an RMSE of 0.182215 and did not beat baseline at 0.171387.**
+
+Although many of our selected features showed a statistically significant relationship with our target variable; our models indicated that none of the features were as impactful as we had initially believed.
 
 # Recommendations
-..........
-
+* Our current best model did not beat baseline and is not ready for implementation.
+* We would like more time to further explore our current data and possibly acquire additional data. This would allow us to possibly improve our current model.
