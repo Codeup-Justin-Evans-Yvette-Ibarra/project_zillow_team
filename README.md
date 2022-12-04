@@ -1,4 +1,9 @@
-# 2017 Home Tax Value Log Error Prediction Analysis
+# Final Report Team Zillow Project
+
+## Group 4
+* Justin Evans
+* Yvette Ibarra
+
 # Project Overview
 Zillow’s Zestimate is a home valuation in the real estate industry and created to give consumers as much information as possible about homes and the housing market. We will be looking into the log error of Zillow data from 2017 of single family properties to evaluate and analysis the drivers of log error.
 
