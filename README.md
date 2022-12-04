@@ -16,28 +16,25 @@ This team has been tasked to collect, clean and alayze Zillow data from 2017 in 
 
 # Reproduction of this Data:
 * Can be accomplished using a local env.py containing user, password, host information for access to the Codeup SQL database server.
-* All other step by step instructions can be found by reading the below Jupyter Notebook files located in our Codeup-Justin-Evans-Yvette-Ibarra github repository.
-* Final_Report_Zillow_Team_Project.ipynb
-* wrangle.py
-* explore.py
-* model.py
-* Justin_workbook.ipynb
-* Yvette_workbook_1.ipynb
-* Yvette_workbook_2.ipynb
-
+* All other step by step instructions can be found by reading and running the below Jupyter Notebook file located in our Codeup-Justin-Evans-Yvette-Ibarra github repository found here: (https://github.com/Codeup-Justin-Evans-Yvette-Ibarra/project_zillow_team).
+    * Final_Report_Zillow_Team_Project.ipynb
+    * wrangle.py
+    * explore.py
+    * model.py
+    
 # Initial Thoughts
-Our initial thoughts is that outliers, age, and L.A. County are drivers of errors in Zestimate.
+Our initial thoughts are that outliers, age, and location are drivers of errors in Zestimate.
 
 # The Plan
 * Acquire data from Codeup database
 * Prepare data
-* Explore data in search of drivers of home_value
+* Explore data in search of drivers of logerror
     * Answer the following initial question:
-        * 
-        * 
-        * 
-        * 
-
+        1. Do Longitude and Lattitude have a relationship with eachother and our target feature of Zillow Zestimate logerror? 
+        2. Is there a relationship between our loc_clusters feature, and each of the five independent clusters 0-4 as binary categorical features, with logerror? 
+        3. Is there a relationship between log_error and tax delinquency? 
+        4. Do homes that are younger than 81 years have more log error?
+        5. Do the clusters have a relationship with logerror and squarefeet of the home?
 * Develop a Model to predict error in zestimate.
     * Use drivers identified in explore to build predictive models of error using...
     * Evaluate models on train and validate data using RMSE (Root mean square Error)
@@ -47,11 +44,10 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 
 
 # Data Dictionary:
-<div class="alert alert-success">
 
     
 ## Continuous Categorical Counts
-|Feature    |Description|
+|Feature    |Description       |
 |:----------|:-----------------|
 |parcelid|Unique Property Index| 
 |bedrooms|Number of bedrooms in home|
@@ -62,7 +58,7 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |yearbuilt|The Year the principal residence was built| 
 
 ## Categorical Binary
-|Feature    |Description           |
+|Feature    |Description       |
 |:----------|:-----------------|
 |has_basement|Basement on property (if any = 1)| 
 |has_deck|Deck on property (if any = 1)| 
@@ -74,7 +70,7 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |has_tax_delinquency|Property has had Tax Delinquncy (if any = 1)| 
 
 ## Location
-|Feature    |Description    |
+|Feature    |Description       |
 |:----------|:-----------------|
 |fips|Federal Information Processing Standards (FIPS), now known as Federal Information Processing Series, are numeric codes assigned by the National Institute of Standards and Technology (NIST). Typically, FIPS codes deal with US states and counties. US states are identified by a 2-digit number, while US counties are identified by a 3-digit number. For example, a FIPS code of 06111, represents California -06 and Ventura County -111.|
 |state|This is the two letter abbreviation for the State as defined by the FIPS code| 
@@ -90,13 +86,13 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |censustractandblock|Census tracts are small, relatively permanent geographic entities within counties and Block numbering areas (BNAs) are geographic entities similar to census tracts, and delineated in counties (or the statistical equivalents of counties) without census tracts.| 
 
 ## Size
-|Feature    |Description           |
+|Feature    |Description       |
 |:----------|:-----------------|
 |sqft|Calculated total finished living area of the home|
 |lotsizesquarefeet|Calculated area of land lot belonging to parcel| 
 
 ## Value
-|Feature    |Description           |
+|Feature    |Description       |
 |:----------|:-----------------|
 |tax_value_bldg|The total tax assessed value of the structure|
 |tax_value|The total tax assessed value of the parcel| 
@@ -104,12 +100,12 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |taxamount|The total tax fee to be collected on the parcel| 
 
 ## Target
-|Feature    |Description           |
+|Feature    |Description       |
 |:----------|:-----------------|
 |log_error|This is the logerror of the Zillow Zestimate|
 
 ## Clusters
-|Feature    |Description          |
+|Feature    |Description       |
 |:----------|:-----------------|
 |loc_clusters|Created using 'longitude', 'latitude', 'age' with n_clusters = 4|
 |cluster_price_size|Created using 'taxamount', 'sqft', 'lot_sqft' with n_clusters = 4|
