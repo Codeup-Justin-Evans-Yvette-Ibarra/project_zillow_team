@@ -86,9 +86,8 @@ Our initial thoughts is that outliers, age, and L.A. County are drivers of error
 |latitude|Latitude is a measurement on a globe or map of location north or south of the Equator. Technically, there are different kinds of latitude, which are geocentric, astronomical, and geographic (or geodetic), but there are only minor differences between them.|
 |zipcode|A group of five or nine numbers that are added to a postal address to assist the sorting of mail.| 
 |regionidcounty|Location code that identifies the Region and County of the property within the state| 
-|rawcensustractandblock|| 
-|censustractandblock|Census tracts are small, relatively permanent geographic entities within counties and Block numbering areas (BNAs) are geographic entities similar to census tracts, and delineated in counties (or the statistical equivalents of counties)
-without census tracts.| 
+|rawcensustractandblock|Raw unformatted data that identifies Census tracts and blocks| 
+|censustractandblock|Census tracts are small, relatively permanent geographic entities within counties and Block numbering areas (BNAs) are geographic entities similar to census tracts, and delineated in counties (or the statistical equivalents of counties) without census tracts.| 
 
 ## Size
 |Feature    |Description           |
