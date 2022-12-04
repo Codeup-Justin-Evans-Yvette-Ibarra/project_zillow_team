@@ -30,11 +30,17 @@ Our initial thoughts are that outliers, age, and location are drivers of errors 
 * Prepare data
 * Explore data in search of drivers of logerror
 * Answer the following initial question:
-    1. Do Longitude and Lattitude have a relationship with eachother and our target feature of Zillow Zestimate logerror? 
-    2. Is there a relationship between our loc_clusters feature, and each of the five independent clusters 0-4 as binary categorical features, with logerror? 
-    3. Is there a relationship between log_error and tax delinquency? 
-    4. Do homes that are younger than 81 years have more log error?
-    5. Do the clusters have a relationship with logerror and squarefeet of the home?
+
+    * **Question 1.** Do Longitude and Lattitude have a relationship with eachother and our target feature of Zillow Zestimate logerror? 
+
+    * **Question 2.** Is there a relationship between our loc_clusters feature, and each of the five independent clusters 0-4 as binary categorical features, with logerror? 
+
+    * **Question 3.** Is there a relationship between log_error and tax delinquency? 
+
+    * **Question 4.** Do homes that are younger than 81 years have more log error?
+
+    * **Question 5.** Do the clusters have a relationship with logerror and squarefeet of the home?
+
 * Develop a Model to predict error in zestimate.
     * Use drivers identified in explore to build predictive models of error using...
     * Evaluate models on train and validate data using RMSE (Root mean square Error)
