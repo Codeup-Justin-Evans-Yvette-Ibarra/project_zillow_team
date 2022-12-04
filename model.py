@@ -282,7 +282,7 @@ def modeling(X_train_scaled, y_train, X_validate_scaled,y_validate, X_test_scale
     # evaluate: rmse
     rmse_validate = mean_squared_error(y_validate.log_error, y_validate.log_pred_lm2) ** 0.5
 
-    print("RMSE for Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, "\nValidation/Out-of-Sample: ", rmse_validate)
+    print("RMSE for F1: Polynomial Model, degrees=2\nTraining/In-Sample: ", rmse_train, "\nValidation/Out-of-Sample: ", rmse_validate)
 
     # append to metric df
     metric_df = make_metric_df(y_validate.log_error, y_validate.log_pred_lm2,'F1: degree2',metric_df)
